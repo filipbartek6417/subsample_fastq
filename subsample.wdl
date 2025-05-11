@@ -18,7 +18,7 @@ task stream_and_sample {
   }
 
   runtime {
-    docker: "biocontainers/seqtk:v1.3--h5bf99c6_1"
+    docker: "quay.io/biocontainers/seqtk:1.3--hec16e2b_3"
     memory: "2G"
     cpu: 1
   }
