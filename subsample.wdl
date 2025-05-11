@@ -13,7 +13,7 @@ task stream_and_sample {
     apt-get update && apt-get install -y apt-utils curl seqtk
 
     # Stream the FASTQ file and subsample using seqtk
-    curl -s ~{fastq_url} | seqtk sample -s100 - ~{sampling_fraction} > subsampled.fastq
+    curl -s ~{fastq_url} | seqtk sample -s100 - ~{sampling_fraction} | gzip > subsampled.fastq.gz
   }
 
   output {
@@ -22,7 +22,7 @@ task stream_and_sample {
 
   runtime {
     docker: "ubuntu:20.04"
-    memory: "2G"
+    memory: "128G"
     cpu: 1
   }
 }
