@@ -10,7 +10,7 @@ task stream_and_sample {
     set -e
 
     # Install seqtk
-    apt-get update && apt-get install -y seqtk
+    apt-get update && apt-get install -y apt-utils curl seqtk
 
     # Stream the FASTQ file and subsample using seqtk
     curl -s ~{fastq_url} | seqtk sample -s100 - ~{sampling_fraction} > subsampled.fastq
