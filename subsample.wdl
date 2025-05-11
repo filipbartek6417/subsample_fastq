@@ -17,7 +17,7 @@ task stream_and_sample {
   }
 
   output {
-    File subsampled_fastq = "subsampled.fastq"
+    File subsampled_fastq = "subsampled.fastq.gz"
   }
 
   runtime {
