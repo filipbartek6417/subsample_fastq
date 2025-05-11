@@ -1,0 +1,6 @@
+version: 1.2
+workflows:
+  - name: subsample_fastq
+    subclass: WDL
+    primaryDescriptorPath: /subsample.wdl
+    testParameterFiles: []
