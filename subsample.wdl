@@ -6,19 +6,22 @@ task stream_and_sample {
     Float sampling_fraction
   }
 
-  command <<<
+  command {
     set -e
+
+    # Install seqtk
+    apt-get update && apt-get install -y seqtk
 
     # Stream the FASTQ file and subsample using seqtk
     curl -s ~{fastq_url} | seqtk sample -s100 - ~{sampling_fraction} > subsampled.fastq
-  >>>
+  }
 
   output {
     File subsampled_fastq = "subsampled.fastq"
   }
 
   runtime {
-    docker: "quay.io/biocontainers/seqtk:1.3--hec16e2b_3"
+    docker: "ubuntu:20.04"
     memory: "2G"
     cpu: 1
   }
