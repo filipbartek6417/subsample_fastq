@@ -22,7 +22,8 @@ task stream_and_sample {
 
   runtime {
     docker: "ubuntu:20.04"
-    memory: "128G"
+    memory: "64G"
+    disks: "local-disk 150 SSD"
     cpu: 1
   }
 }
