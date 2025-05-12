@@ -11,19 +11,26 @@ task stream_and_sample {
 
     # Install seqtk
     apt-get update && apt-get install -y apt-utils curl seqtk
-
-    # Stream the FASTQ file and subsample using seqtk
+    pip install pairtools
     curl -s ~{fastq_url} | seqtk sample -s100 - ~{sampling_fraction} | gzip > subsampled.fastq.gz
+
+    curl -s ~{reference_path} | gzip -d | bwa index
+    bwa mem -5SP -T0 -t16 hs1.fa subsampled.fastq.gz -o aligned.sam
+    pairtools parse --min-mapq 40 --walks-policy 5unique --max-inter-align-gap 30 --nproc-in 8 --nproc-out 8 --chroms-path hs1.genome aligned.sam > parsed.pairsam
+    mkdir ebs
+    mkdir ebs/temp
+    pairtools sort --nproc 16 --tmpdir=./ebs/temp/ parsed.pairsam > sorted.pairsam
+    pairtools dedup --nproc-in 8 --nproc-out 8 --mark-dups --output-stats stats.txt --output dedup.pairsam sorted.pairsam
   }
 
   output {
-    File subsampled_fastq = "subsampled.fastq.gz"
+    File stats = "stats.txt"
   }
 
   runtime {
     docker: "ubuntu:20.04"
     memory: "64G"
-    disks: "local-disk 150 SSD"
+    disks: "local-disk 200 SSD"
     cpu: 16
   }
 }
@@ -31,6 +38,7 @@ task stream_and_sample {
 workflow sample_fastq {
   input {
     String fastq_url = "https://s3-us-west-2.amazonaws.com/human-pangenomics/submissions/5b73fa0e-658a-4248-b2b8-cd16155bc157--UCSC_GIAB_R1041_nanopore/HG002_R1041_PoreC/Dorado_v4/HG002_1_Dorado_v4_R1041_PoreC_400bps_sup.fastq.gz"
+    String reference_path = "https://hgdownload.soe.ucsc.edu/goldenPath/hs1/bigZips/hs1.fa.gz"
     Float sampling_fraction = 0.2
   }
 
@@ -41,6 +49,6 @@ workflow sample_fastq {
   }
 
   output {
-    File subsampled_fastq = stream_and_sample.subsampled_fastq
+    File subsampled_fastq = stream_and_sample.stats
   }
 }
