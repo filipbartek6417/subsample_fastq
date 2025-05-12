@@ -46,7 +46,8 @@ workflow sample_fastq {
   call stream_and_sample {
     input:
       fastq_url = fastq_url,
-      sampling_fraction = sampling_fraction
+      sampling_fraction = sampling_fraction,
+      reference_path = reference_path
   }
 
   output {
