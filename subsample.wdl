@@ -11,7 +11,7 @@ task stream_and_sample {
     set -e
 
     # Install seqtk
-    apt-get update && apt-get install -y apt-utils curl seqtk python3 pip
+    apt-get update && apt-get install -y apt-utils curl seqtk python3 pip bwa
     pip install pairtools
     curl -s ~{fastq_url} | seqtk sample -s100 - ~{sampling_fraction} | gzip > subsampled.fastq.gz
 
