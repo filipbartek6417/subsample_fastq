@@ -51,6 +51,6 @@ workflow sample_fastq {
   }
 
   output {
-    File subsampled_fastq = stream_and_sample.stats
+    File stats = stream_and_sample.stats
   }
 }
