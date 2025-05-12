@@ -3,6 +3,7 @@ version 1.0
 task stream_and_sample {
   input {
     String fastq_url
+    String reference_path
     Float sampling_fraction
   }
 
