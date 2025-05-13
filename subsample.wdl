@@ -11,13 +11,14 @@ task stream_and_sample {
     set -e
 
     # Install seqtk
-    apt-get update && apt-get install -y apt-utils curl seqtk python3 pip bwa
+    apt-get update && apt-get install -y apt-utils curl seqtk python3 pip bwa coreutils
     pip install pairtools
     curl -s ~{fastq_url} | seqtk sample -s100 - ~{sampling_fraction} | gzip > subsampled.fastq.gz
 
     curl -s ~{reference_path} | gzip -d > hs1.fa
     bwa index hs1.fa
-    bwa mem -5SP -T0 -t16 hs1.fa subsampled.fastq.gz -o aligned.sam
+    timeout 20m bwa mem -5SP -T0 -t16 hs1.fa subsampled.fastq.gz -o aligned.sam
+    awk 'NR > 1 && length($10) != length($11) {print NR, $0}' aligned.sam
     pairtools parse --min-mapq 40 --walks-policy 5unique --max-inter-align-gap 30 --nproc-in 8 --nproc-out 8 --chroms-path hs1.genome aligned.sam > parsed.pairsam
     mkdir ebs
     mkdir ebs/temp
