@@ -18,35 +18,10 @@ task stream_and_sample {
     curl -s ~{reference_path} | gzip -d > hs1.fa
     bwa index hs1.fa
     timeout 20m bwa mem -5SP -T0 -t16 hs1.fa subsampled.fastq.gz -o aligned.sam
-    
-
-    seen_lines=()
-    line_number=0
-
-    tail -n +2 aligned.sam | while IFS= read -r line; do
-        ((line_number++))
-        if [[ $(echo "$line" | wc -w) -ge 11 ]]; then
-            field10=$(echo "$line" | cut -f10)
-            field11=$(echo "$line" | cut -f11)
-            if [[ ${#field10} -ne ${#field11} ]]; then
-                if [[ ! " ${seen_lines[*]} " =~ " $line " ]]; then
-                    seen_lines+=("$line")
-                    echo "$line_number $line"
-                fi
-            fi
-        fi
-    done
-
-
-    pairtools parse --min-mapq 40 --walks-policy 5unique --max-inter-align-gap 30 --nproc-in 8 --nproc-out 8 --chroms-path hs1.genome aligned.sam > parsed.pairsam
-    mkdir ebs
-    mkdir ebs/temp
-    pairtools sort --nproc 16 --tmpdir=./ebs/temp/ parsed.pairsam > sorted.pairsam
-    pairtools dedup --nproc-in 8 --nproc-out 8 --mark-dups --output-stats stats.txt --output dedup.pairsam sorted.pairsam
   }
 
   output {
-    File stats = "stats.txt"
+    File aligned = "aligned.sam"
   }
 
   runtime {
@@ -72,6 +47,6 @@ workflow sample_fastq {
   }
 
   output {
-    File stats = stream_and_sample.stats
+    File aligned = stream_and_sample.aligned
   }
 }
