@@ -6,6 +6,7 @@ task stream_and_sample {
     Float sampling_fraction
   }
 
+
   command {
     set -e
     apt-get update && apt-get install -y apt-utils seqtk
